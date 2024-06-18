@@ -5,8 +5,12 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "bun run db:migrate && next start",
+    "lint": "next lint",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "bun ./db/migrate.ts",
+    "db:studio": "drizzle-kit studio",
+    "db:push": "drizzle-kit push"
   },
   "dependencies": {
     "@clerk/backend": "^1.2.3",
@@ -17,9 +21,11 @@
     "@radix-ui/react-slot": "^1.0.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "drizzle-orm": "^0.31.2",
     "hono": "^4.4.6",
     "lucide-react": "^0.395.0",
     "next": "^14.2.4",
+    "postgres": "^3.4.4",
     "react": "^18",
     "react-dom": "^18",
     "react-use": "^17.5.0",
@@ -31,6 +37,8 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "dotenv": "^16.4.5",
+    "drizzle-kit": "^0.22.7",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
