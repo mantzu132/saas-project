@@ -1,34 +1,20 @@
-import { Hono } from 'hono'
-import { handle } from 'hono/vercel'
-import { z } from 'zod'
-import { zValidator } from '@hono/zod-validator'
+import { Hono } from "hono";
+import { handle } from "hono/vercel";
+import { z } from "zod";
 
-import { clerkMiddleware, getAuth } from '@hono/clerk-auth'
-
-export const runtime = 'edge';
+import accounts from "@/app/api/[[...route]]/accounts";
+import { HTTPException } from "hono/http-exception";
 
 const schema = z.object({
-    name: z.string(),
-    age: z.number(),
-})
+  name: z.string(),
+  age: z.number(),
+});
 
-const app = new Hono().basePath('/api')
+const app = new Hono().basePath("/api");
 
+const routes = app.route("/accounts", accounts);
 
-app.get('/hello', clerkMiddleware(), (c) => {
-    const auth = getAuth(c);
+export type AppType = typeof routes;
 
-    if(!auth?.userId){
-        return c.json({
-            success: "NOPE PLIS LOGIN"
-        })
-    }
-    return c.json({
-        success: true,
-        message: `hello world!`,
-    })
-})
-
-
-export const GET = handle(app)
-export const POST = handle(app)
+export const GET = handle(app);
+export const POST = handle(app);
