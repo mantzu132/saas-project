@@ -6,7 +6,7 @@ import { HTTPException } from "hono/http-exception";
 import { zValidator } from "@hono/zod-validator";
 import { accounts, insertAccountsSchema } from "@/db/schema";
 import { createId } from "@paralleldrive/cuid2";
-
+// API ACCOUNTS POST GET
 const app = new Hono()
   .get("/", clerkMiddleware(), async (c) => {
     const auth = getAuth(c);

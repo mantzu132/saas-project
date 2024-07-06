@@ -25,7 +25,7 @@ export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const pathName = usePathname();
 
-  const handleClick = (href) => {
+  const handleClick = (href: string) => {
     router.push(href);
     setIsOpen(false);
   };
