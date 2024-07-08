@@ -6,9 +6,9 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="lg:px-14">
+    <>
       <Header />
-      {children}
-    </div>
+      <div className="lg:px-14">{children}</div>
+    </>
   );
 }
