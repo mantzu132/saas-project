@@ -8,7 +8,6 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  Row,
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
@@ -26,12 +25,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Trash } from "lucide-react";
+import { useConfirm } from "@/hooks/use-confirm";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   filterKey: string;
-  onDelete: (rows: Row<TData>[]) => void;
+  onDelete: (rows: unknown[]) => void;
   disabled?: boolean;
 }
 
@@ -42,6 +42,10 @@ export function DataTable<TData, TValue>({
   onDelete,
   disabled,
 }: DataTableProps<TData, TValue>) {
+  const [ConfirmationDialog, confirm] = useConfirm(
+    "Are you sure?",
+    "You are abotu to perform a bulk delete",
+  );
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -77,15 +81,28 @@ export function DataTable<TData, TValue>({
           className="max-w-sm"
         />
         {table.getFilteredSelectedRowModel().rows.length > 0 && (
-          <Button
-            variant="outline"
-            size="sm"
-            className=" text-xs"
-            disabled={disabled}
-          >
-            <Trash className="size-4 mr-2" /> Delete{" "}
-            {table.getFilteredSelectedRowModel().rows.length}
-          </Button>
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              className=" text-xs"
+              disabled={disabled}
+              onClick={async () => {
+                const ok = await confirm();
+
+                if (ok) {
+                  onDelete(
+                    table.getSelectedRowModel().rows.map((row) => row.original),
+                  );
+                  table.resetRowSelection();
+                }
+              }}
+            >
+              <Trash className="size-4 mr-2" /> Delete{" "}
+              {table.getFilteredSelectedRowModel().rows.length}
+            </Button>
+            <ConfirmationDialog />
+          </>
         )}
       </div>
       <div className="rounded-md border">

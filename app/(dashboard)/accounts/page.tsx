@@ -8,11 +8,22 @@ import { columns } from "@/app/(dashboard)/accounts/columns";
 import { DataTable } from "@/components/data-table";
 import { useGetAccounts } from "@/features/accounts/api/use-get-accounts";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useBulkDelete } from "@/features/accounts/api/use-bulk-delete";
 
 export default function AccountsPage() {
   const newAccount = useNewAccount();
   const accountsQuery = useGetAccounts();
   const accounts = accountsQuery.data || [];
+  const deleteAccounts = useBulkDelete(); // useQuery mutation
+
+  const disableTable = accountsQuery.isLoading || deleteAccounts.isPending;
+
+  function handleDeletion(selectedRows: unknown[]) {
+    // @ts-ignore
+    const selectedIds = selectedRows.map((item) => item.id);
+
+    deleteAccounts.mutate({ ids: selectedIds });
+  }
 
   if (accountsQuery.isLoading) {
     return (
@@ -41,10 +52,11 @@ export default function AccountsPage() {
       </CardHeader>
       <CardContent>
         <DataTable
-          onDelete={() => {}}
+          onDelete={handleDeletion}
           columns={columns}
           data={accounts}
           filterKey="name"
+          disabled={disableTable}
         />
       </CardContent>
     </Card>
