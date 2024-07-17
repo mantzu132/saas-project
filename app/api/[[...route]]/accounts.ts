@@ -26,6 +26,36 @@ const app = new Hono()
     });
     return c.json({ data });
   })
+  .get(
+    "/:id",
+    zValidator("param", z.object({ id: z.string() })),
+    clerkMiddleware(),
+    async (c) => {
+      const auth = getAuth(c);
+      if (!auth?.userId) {
+        throw new HTTPException(401, {
+          res: c.json({ error: "Unauthorized" }, 401),
+        });
+      }
+
+      const { id } = c.req.valid("param");
+
+      const data = await db.query.accounts.findMany({
+        where: (accounts, { eq, and }) =>
+          and(eq(accounts.id, id), eq(accounts.userId, auth.userId)),
+        columns: {
+          id: true,
+          name: true,
+        },
+      });
+
+      if (data.length === 0) {
+        return c.json({ error: "Not found or unauthorized" }, 404);
+      }
+
+      return c.json({ data });
+    },
+  )
   .post(
     "/",
     clerkMiddleware(),

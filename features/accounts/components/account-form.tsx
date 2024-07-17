@@ -36,7 +36,8 @@ export const AccountForm = ({
 }: Props) => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: defaultValues,
+    defaultValues: { name: "" },
+    values: defaultValues,
   });
 
   const handleSubmit = (values: FormValues) => {
@@ -49,7 +50,7 @@ export const AccountForm = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="name"
