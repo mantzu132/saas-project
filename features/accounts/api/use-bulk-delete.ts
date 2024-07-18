@@ -17,6 +17,12 @@ export const useBulkDelete = () => {
   const mutation = useMutation<ResponseType, Error, RequestType>({
     mutationFn: async (json) => {
       const response = await client.api.accounts["bulk-delete"].$post({ json });
+
+      if (!response.ok) {
+        // This will throw an error for non-2xx status codes
+        throw new Error("Failed to delete the accounts");
+      }
+
       return await response.json();
     },
     onSuccess: () => {

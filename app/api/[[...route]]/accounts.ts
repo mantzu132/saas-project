@@ -56,6 +56,42 @@ const app = new Hono()
       return c.json({ data });
     },
   )
+  .patch(
+    "/:id",
+    zValidator("param", z.object({ id: z.string() })),
+    clerkMiddleware(),
+    zValidator("json", insertAccountsSchema.pick({ name: true })),
+    async (c) => {
+      const auth = getAuth(c);
+      if (!auth?.userId) {
+        throw new HTTPException(401, {
+          res: c.json({ error: "Unauthorized" }, 401),
+        });
+      }
+
+      const { id } = c.req.valid("param");
+
+      if (!id || id === "undefined") {
+        throw new HTTPException(400, {
+          res: c.json({ error: "Missing ID" }, 400),
+        });
+      }
+
+      const { name } = c.req.valid("json");
+
+      const data = await db
+        .update(accounts)
+        .set({ name })
+        .where(eq(accounts.id, id))
+        .returning();
+
+      if (data.length === 0) {
+        return c.json({ error: "Not found or unauthorized" }, 404);
+      }
+
+      return c.json({ data });
+    },
+  )
   .post(
     "/",
     clerkMiddleware(),
