@@ -8,6 +8,13 @@
       "when": 1718716181443,
       "tag": "0000_chief_moon_knight",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1721298456677,
+      "tag": "0001_hesitant_phalanx",
+      "breakpoints": true
     }
   ]
 }
