@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import accounts from "@/app/api/[[...route]]/accounts";
 import { HTTPException } from "hono/http-exception";
+import transactions from "@/app/api/[[...route]]/transactions";
 
 const schema = z.object({
   name: z.string(),
@@ -12,7 +13,9 @@ const schema = z.object({
 
 const app = new Hono().basePath("/api");
 
-const routes = app.route("/accounts", accounts);
+const routes = app
+  .route("/accounts", accounts)
+  .route("/transactions", transactions);
 
 export type AppType = typeof routes;
 
