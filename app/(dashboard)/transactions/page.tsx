@@ -3,29 +3,31 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, Plus } from "lucide-react";
-import { columns } from "@/app/(dashboard)/accounts/columns";
+import { columns } from "@/app/(dashboard)/transactions/columns";
 import { DataTable } from "@/components/data-table";
-import { useGetAccounts } from "@/features/accounts/api/use-get-accounts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useBulkDeleteAccounts } from "@/features/accounts/api/use-bulk-delete-accounts";
 import { useNewTransaction } from "@/features/transactions/hooks/use-new-transaction";
+import { useGetTransactions } from "@/features/transactions/api/use-get-transactions";
+import { useBulkDeleteTransactions } from "@/features/transactions/api/use-bulk-delete-transactions";
 
 export default function TransactionsPage() {
   const newTransaction = useNewTransaction();
-  const accountsQuery = useGetAccounts();
-  const accounts = accountsQuery.data || [];
-  const deleteAccounts = useBulkDeleteAccounts(); // useQuery mutation
+  const transactionQuery = useGetTransactions();
+  const transactions = transactionQuery.data || [];
+  const deleteTransactions = useBulkDeleteTransactions(); // useQuery mutation
 
-  const disableTable = accountsQuery.isLoading || deleteAccounts.isPending;
+  const disableTable =
+    transactionQuery.isLoading || deleteTransactions.isPending;
 
   function handleDeletion(selectedRows: unknown[]) {
     // @ts-ignore
     const selectedIds = selectedRows.map((item) => item.id);
 
-    deleteAccounts.mutate({ ids: selectedIds });
+    deleteTransactions.mutate({ ids: selectedIds });
   }
 
-  if (accountsQuery.isLoading) {
+  if (transactionQuery.isLoading) {
     return (
       <Card className="border-none drop-shadow-sm pb-10 -mt-24">
         <CardHeader className="gap-y-2 lg:flex-row lg:items-center lg:justify-between">
@@ -56,8 +58,8 @@ export default function TransactionsPage() {
         <DataTable
           onDelete={handleDeletion}
           columns={columns}
-          data={accounts}
-          filterKey="name"
+          data={transactions}
+          filterKey="payee"
           disabled={disableTable}
         />
       </CardContent>

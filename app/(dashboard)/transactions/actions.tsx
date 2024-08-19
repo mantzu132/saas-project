@@ -8,13 +8,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
-import { useOpenAccount } from "@/features/accounts/hooks/use-open-account";
+import { useOpenTransaction } from "@/features/transactions/hooks/use-open-transaction";
 
 type Props = {
   id: string;
 };
 export const Actions = ({ id }: Props) => {
-  const { onOpen } = useOpenAccount();
+  const { onOpen } = useOpenTransaction();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

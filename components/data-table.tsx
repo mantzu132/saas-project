@@ -46,6 +46,7 @@ export function DataTable<TData, TValue>({
     "Are you sure?",
     "You are abotu to perform a bulk delete",
   );
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(

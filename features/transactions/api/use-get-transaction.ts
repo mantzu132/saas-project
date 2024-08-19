@@ -1,5 +1,6 @@
 import { client } from "@/lib/hono";
 import { useQuery } from "@tanstack/react-query";
+import { convertAmountFromMiliunits } from "@/lib/utils";
 
 export const useGetTransaction = (id?: string) => {
   const query = useQuery({
@@ -15,7 +16,14 @@ export const useGetTransaction = (id?: string) => {
       }
 
       const { data } = await response.json();
-      return data;
+
+      // Modify the amount field in the returned data
+      const modifiedData = data.map((transaction: any) => ({
+        ...transaction,
+        amount: convertAmountFromMiliunits(transaction.amount),
+      }));
+
+      return modifiedData;
     },
   });
 

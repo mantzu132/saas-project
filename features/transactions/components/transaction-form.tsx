@@ -40,6 +40,7 @@ type Props = {
   onDelete?: () => void;
   accountOptions: { label: string; value: string }[];
   onCreateAccount: (name: string) => void;
+  defaultValues: {};
 };
 
 export const TransactionForm = ({
@@ -49,14 +50,16 @@ export const TransactionForm = ({
   disabled,
   accountOptions,
   onCreateAccount,
+  defaultValues,
 }: Props) => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {},
+    values: defaultValues,
   });
 
   const handleSubmit = (values: FormValues) => {
     const convertedAmount = convertAmountToMiliunits(parseFloat(values.amount));
+
     onSubmit({ ...values, amount: convertedAmount });
   };
 
