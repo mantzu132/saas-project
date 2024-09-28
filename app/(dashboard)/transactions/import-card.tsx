@@ -1,11 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { UploadButton } from "@/app/(dashboard)/transactions/upload-button";
-import { DataTable } from "@/components/data-table";
-import { columns } from "@/app/(dashboard)/transactions/columns";
+import { format, parse } from "date-fns";
 import { useState } from "react";
 import { ImportTable } from "@/app/(dashboard)/transactions/import-table";
+import { convertAmountToMiliunits } from "@/lib/utils";
 
 type Props = {
   data: string[][];
@@ -22,16 +21,65 @@ export interface selectedColumnState {
 }
 
 export const ImportCard = ({ onCancel, data, onSubmit }: Props) => {
+  console.log(data);
   const [selectedColumns, setSelectedColumns] = useState<selectedColumnState>(
     {},
   );
-
-  const progress = Object.values(selectedColumns).filter(Boolean).length;
+  const progress = Object.values(selectedColumns).filter(
+    (value) => value !== null && requiredOptions.includes(value),
+  ).length;
 
   const headers = data[0];
   const body = data.slice(1);
 
-  function onTableHeadSelectChange(value, index) {
+  const handleContinue = () => {
+    const mappedData = {
+      headers: headers.map((_headers, index) => {
+        return selectedColumns[`column_${index}`] || null;
+      }),
+
+      body: body
+        .map((transaction) => {
+          const transformedTransaction = transaction.map((cell, index) =>
+            selectedColumns[`column_${index}`] ? cell : null,
+          );
+
+          return transformedTransaction.every((item) => item === null)
+            ? []
+            : transformedTransaction;
+        })
+        .filter((row) => row.length >= requiredOptions.length),
+    };
+
+    console.log(mappedData.body, "mappedData.body");
+
+    // converting array matrix into array containing objects (what backend wants)
+
+    const arrayOfData = mappedData.body.map((transaction) =>
+      transaction.reduce((acc: any, cell, index) => {
+        const header = mappedData.headers[index];
+        if (header) {
+          // @ts-ignore
+          acc[mappedData.headers[index]] = cell;
+        }
+        return acc;
+      }, {}),
+    );
+
+    // convert amount to miliunits
+    // formatting dates to match required output format
+    console.log(arrayOfData, "arrayofdata");
+
+    const formattedData = arrayOfData.map((item) => ({
+      ...item,
+      amount: convertAmountToMiliunits(parseFloat(item.amount)),
+      date: format(parse(item.date, dateFormat, new Date()), outputFormat),
+    }));
+
+    onSubmit(formattedData);
+  };
+
+  function onTableHeadSelectChange(value: string | null, index: any) {
     setSelectedColumns((prev) => {
       const newSelectedColumns = { ...prev };
 
@@ -62,7 +110,7 @@ export const ImportCard = ({ onCancel, data, onSubmit }: Props) => {
           </Button>
 
           <Button
-            onClick={onSubmit}
+            onClick={handleContinue}
             disabled={requiredOptions.length > progress}
             size="sm"
           >
@@ -75,6 +123,7 @@ export const ImportCard = ({ onCancel, data, onSubmit }: Props) => {
           headers={headers}
           body={body}
           selectedColumns={selectedColumns}
+          requiredOptions={requiredOptions}
           onTableHeadSelectChange={onTableHeadSelectChange}
         />
       </CardContent>

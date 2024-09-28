@@ -5,6 +5,7 @@ interface ImportTableProps {
   body: string[][];
   selectedColumns?: selectedColumnState;
   onTableHeadSelectChange?: (columnIndex: number, value: string | null) => void;
+  requiredOptions: string[];
 }
 
 import {
@@ -22,6 +23,7 @@ export const ImportTable = ({
   body,
   selectedColumns,
   onTableHeadSelectChange,
+  requiredOptions,
 }: ImportTableProps) => {
   return (
     <div className="rounded-md border">
@@ -34,6 +36,7 @@ export const ImportTable = ({
                   columnIndex={index}
                   selectedColumns={selectedColumns}
                   onChange={onTableHeadSelectChange}
+                  requiredOptions={requiredOptions}
                 />
               </TableHead>
             ))}
