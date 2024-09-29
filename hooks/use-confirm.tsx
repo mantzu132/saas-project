@@ -1,5 +1,6 @@
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -35,8 +36,12 @@ export const useConfirm = (
     handleClose();
   };
 
+  const handleOpen = (state: boolean) => {
+    state || handleCancel();
+  };
+
   const ConfirmationDialog = () => (
-    <Dialog open={promise !== null}>
+    <Dialog open={promise !== null} onOpenChange={handleOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>

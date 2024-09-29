@@ -44,7 +44,7 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [ConfirmationDialog, confirm] = useConfirm(
     "Are you sure?",
-    "You are abotu to perform a bulk delete",
+    "You are about to perform a bulk delete",
   );
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
