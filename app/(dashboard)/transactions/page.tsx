@@ -12,6 +12,10 @@ import { useBulkDeleteTransactions } from "@/features/transactions/api/use-bulk-
 import { useState } from "react";
 import { UploadButton } from "@/app/(dashboard)/transactions/upload-button";
 import { ImportCard } from "@/app/(dashboard)/transactions/import-card";
+import { transactions as transactionSchema } from "@/db/schema";
+import { useSelectAccount } from "@/features/accounts/hooks/use-select-account";
+import { useBulkCreateTransactions } from "@/features/transactions/api/use-bulk-create-transactions";
+import { toast } from "sonner";
 
 enum VARIANTS {
   LIST = "LIST",
@@ -37,10 +41,17 @@ export default function TransactionsPage() {
     setImportResults(INITIAL_IMPORT_RESULTS);
     setVariant(VARIANTS.LIST);
   };
+
+  const bulkCreateMutation = useBulkCreateTransactions();
   const newTransaction = useNewTransaction();
   const transactionQuery = useGetTransactions();
   const transactions = transactionQuery.data || [];
   const deleteTransactions = useBulkDeleteTransactions(); // useQuery mutation
+
+  const [ConfirmationDialog, confirm] = useSelectAccount(
+    "Select Account",
+    "Select the account to which the transactions will belong to",
+  );
 
   const disableTable =
     transactionQuery.isLoading || deleteTransactions.isPending;
@@ -51,6 +62,34 @@ export default function TransactionsPage() {
 
     deleteTransactions.mutate({ ids: selectedIds });
   }
+
+  const onSubmitImport = async (
+    values: (typeof transactionSchema.$inferInsert)[],
+  ) => {
+    console.log("onsubmitImport before await confirm");
+    const accountId = (await confirm()) as string | null | undefined;
+
+    if (!accountId) {
+      // accountId === null when don't select an account and press continue in dialog.
+      toast.error("Failed to create transactions, please choose an account!");
+      return;
+    } else {
+      // @ts-ignore
+      if (accountId === "none") {
+        // accountId === none when we cancel the account selection dialog.
+        return;
+      }
+    }
+
+    const readyData = values.map((value) => ({
+      ...value,
+      accountId: accountId,
+    }));
+
+    bulkCreateMutation.mutate(readyData, {
+      onSuccess: () => onCancelImport(),
+    });
+  };
 
   if (transactionQuery.isLoading) {
     return (
@@ -74,8 +113,10 @@ export default function TransactionsPage() {
         <ImportCard
           data={importResults.data}
           onCancel={onCancelImport}
-          onSubmit={() => {}}
+          onSubmit={onSubmitImport}
         />
+
+        <ConfirmationDialog />
       </>
     );
   }

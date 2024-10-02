@@ -5,6 +5,7 @@ import { format, parse } from "date-fns";
 import { useState } from "react";
 import { ImportTable } from "@/app/(dashboard)/transactions/import-table";
 import { convertAmountToMiliunits } from "@/lib/utils";
+import { toast } from "sonner";
 
 type Props = {
   data: string[][];
@@ -21,7 +22,6 @@ export interface selectedColumnState {
 }
 
 export const ImportCard = ({ onCancel, data, onSubmit }: Props) => {
-  console.log(data);
   const [selectedColumns, setSelectedColumns] = useState<selectedColumnState>(
     {},
   );
@@ -70,11 +70,32 @@ export const ImportCard = ({ onCancel, data, onSubmit }: Props) => {
     // formatting dates to match required output format
     console.log(arrayOfData, "arrayofdata");
 
-    const formattedData = arrayOfData.map((item) => ({
-      ...item,
-      amount: convertAmountToMiliunits(parseFloat(item.amount)),
-      date: format(parse(item.date, dateFormat, new Date()), outputFormat),
-    }));
+    let formattedData: any[];
+    try {
+      formattedData = arrayOfData.map((item) => {
+        const parsedAmount = parseFloat(item.amount);
+
+        // Check if amount is a valid number
+        if (isNaN(parsedAmount)) {
+          throw new Error(`Invalid amount value: ${item.amount}`);
+        }
+
+        return {
+          ...item,
+          amount: convertAmountToMiliunits(parsedAmount),
+          // if its not valid date will also throw error.
+          date: format(parse(item.date, dateFormat, new Date()), outputFormat),
+        };
+      });
+    } catch (error) {
+      // @ts-ignore
+      toast.error(error.message);
+      return;
+    }
+
+    console.log(formattedData, "formattedData that gets passed to onSubmit");
+
+    console.log("calling onsubmit...");
 
     onSubmit(formattedData);
   };

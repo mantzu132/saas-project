@@ -11,7 +11,7 @@ type RequestType = InferRequestType<
   (typeof client.api.transactions)["bulk-create"]["$post"]
 >["json"];
 
-export const useBulkDeleteTransactions = () => {
+export const useBulkCreateTransactions = () => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
@@ -22,7 +22,7 @@ export const useBulkDeleteTransactions = () => {
 
       if (!response.ok) {
         // This will throw an error for non-2xx status codes
-        throw new Error("Failed to delete the transactions");
+        throw new Error("Failed to create the transactions");
       }
 
       return await response.json();
@@ -33,7 +33,7 @@ export const useBulkDeleteTransactions = () => {
       // TODO: ALSO INVALIDATE SUMMARY
     },
     onError: () => {
-      toast.error("Failed to delete transaction(s)");
+      toast.error("Failed to create transactions");
     },
   });
 

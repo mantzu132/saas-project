@@ -26,7 +26,6 @@ export const TableHeadSelect = ({
 }: TableHeadSelectProps) => {
   const currentSelect = selectedColumns?.[`column_${columnIndex}`];
 
-  console.log(selectedColumns);
   return (
     <Select
       value={currentSelect || "skip"}
