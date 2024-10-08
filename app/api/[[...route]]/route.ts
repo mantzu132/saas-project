@@ -3,8 +3,8 @@ import { handle } from "hono/vercel";
 import { z } from "zod";
 
 import accounts from "@/app/api/[[...route]]/accounts";
-import { HTTPException } from "hono/http-exception";
 import transactions from "@/app/api/[[...route]]/transactions";
+import summary from "@/app/api/[[...route]]/summary";
 
 const schema = z.object({
   name: z.string(),
@@ -15,7 +15,8 @@ const app = new Hono().basePath("/api");
 
 const routes = app
   .route("/accounts", accounts)
-  .route("/transactions", transactions);
+  .route("/transactions", transactions)
+  .route("/summary", summary);
 
 export type AppType = typeof routes;
 
